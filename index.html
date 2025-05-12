@@ -1,11 +1,15 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Transformações de Joukowski</title>
   <link rel="stylesheet" href="style.css" />
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
+
 <body>
   <header>
     <nav>
@@ -17,13 +21,46 @@
 
   <main>
     <section id="inicio">
-      <h2>Transformações de Joukowski</h2>
-      <p>Esta é a secção de início.</p>
+      <h2>Introdução à Transformação de Joukowski</h2>
+      <p>A transformação de Joukowski é definida pela seguinte função complexa:</p>
+      <div class="formula">$$w = z + \frac{c²}{z} , c² > 0$$</div>
+      <p>sendo que \(w\) e \(z\) são variáveis complexas e podem ser escritas na seguinte forma, $$z = x + iy$$ A
+        transformação de Joukowski é um exemplo de uma transformação conforme, ou seja, é uma função que preserva
+        os ângulos entre curvas no plano complexo.
+        Para compreender melhor a transformação, é importante explorar o conceito mais geral de transformações
+        conformes.
+      </p>
     </section>
 
     <section id="trans">
-      <h2>Secção 1</h2>
-      <p>Conteúdo da primeira secção...</p>
+      <h2>Transformações Conformes</h2>
+      <h4>O que são transformações conformes?</h4>
+      <p>Transformações conformes são funções que preservam os ângulos entre curvas,
+        incluindo a magnitude e orientação desses ângulos. No entanto, não preservam o
+        comprimento dos segmentos de reta nem a escala das figuras. Estas transformações são representadas por funções
+        holomorfas, ou seja, funções que são deriváveis em um domínio aberto. Como consequência,
+        são contínuas e suaves, no sentido em que não apresenta descontinuidades, cantos ou mudanças bruscas de direção.
+      </p>
+
+      <h2>Transformação de Joukowski</h2>
+      <p>Como sabemos a transformação é uma função racional definida por $$w = z + \frac{c²}{z}$$ sendo utilizada em
+        aerodinâmica para transformar círculos no plano \(z\) em perfis aerodinâmicos no plano \(w\).
+        Neste projeto, consideramos o caso particular com o \(c = 1 \), resultando a seguinte função: $$ w = z +
+        \frac{1}{z}$$
+        Esta função é uma transformação conforme em \(C \) \ { -1, 0, 1} pois quando derivamos a função \(w\), obtemos
+        $$w' = 1 + \frac{1}{z²}$$ e verificamos que se anula nos pontos
+        \(z = 1\) e \(z = -1\). Além disso, a função não está definida em \(z = 0\), logo também não é conforme nesse
+        ponto.
+        Para este caso, consideramos \( z = c e^{i\theta} \), que representa um círculo de raio \( c \) centrado na
+        origem do plano \( z \), com \( \theta \in [0, 2\pi] \).
+        Aplicando a transformação de Joukowski com \( w = z + \frac{1}{z} \), obtemos:
+        \[ w = c e^{i\theta} + \frac{1}{c e^{i\theta}} = c e^{i\theta} + \frac{1}{c} e^{-i\theta} \] Separando a parte
+        real e imaginária:
+        \[ w = \left( c + \frac{1}{c} \right) \cos\theta + i \left( c - \frac{1}{c} \right) \sin\theta \]
+        Portanto, a imagem de um círculo no plano \( z \) sob a transformação de Joukowski é, em geral, uma curva
+        semelhante a um elipse no plano \( w \). No caso particular em que \( c = 1 \), obtemos: \[ w = 2 \cos\theta \]
+        que corresponde a um segmento real entre -2 e 2, uma vez que a parte imaginária se anula.
+      </p>
     </section>
 
     <section id="app">
@@ -42,9 +79,9 @@
 
         <div class="center-control">
           <label for="centerX">Centro X</label>
-          <input type="number" id="centerX" value="0" step="0.01" lang="en"/>
+          <input type="number" id="centerX" value="0" step="0.01" lang="en" />
           <label for="centerY">Centro Y</label>
-          <input type="number" id="centerY" value="0" step="0.01" lang="en"/>
+          <input type="number" id="centerY" value="0" step="0.01" lang="en" />
         </div>
       </div>
     </section>
@@ -52,4 +89,5 @@
 
   <script src="script.js"></script>
 </body>
+
 </html>
