@@ -9,6 +9,14 @@ const centerYInput = document.getElementById("centerY");
 let radius = 80;
 let dragging = false;
 
+let offsetX2 = 200; // centro do canvas2
+let offsetY2 = 200;
+let scale2 = 1;
+let offsetX1 = 200;
+let offsetY1 = 200;
+let scale1 = 1;
+
+
 // Estado do centro em coordenadas reais
 let centerReal = { x: 0, y: 0 };
 
@@ -33,87 +41,83 @@ centerYInput.addEventListener("input", (e) => {
   drawTransformed();
 });
 
-function drawAxes(ctx, axisLabels = { x: "x", y: "y" }) {
-    const w = ctx.canvas.width;
-    const h = ctx.canvas.height;
-    const cx = w / 2;
-    const cy = h / 2;
-    const step = 40;
-  
-    ctx.clearRect(0, 0, w, h);
-    ctx.strokeStyle = "#ccc";
-    ctx.lineWidth = 1;
+function drawAxes(ctx, axisLabels = { x: "x", y: "y" }, offsetX = 200, offsetY = 200, scale = 1) {
+  const w = ctx.canvas.width;
+  const h = ctx.canvas.height;
+
+  ctx.clearRect(0, 0, w, h);
+
+  const step = 1; // unidades reais
+  const pixelStep = step * 80 * scale;
+
+  ctx.strokeStyle = "#ccc";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+
+  // Eixo X
+  ctx.moveTo(0, offsetY);
+  ctx.lineTo(w, offsetY);
+  // Eixo Y
+  ctx.moveTo(offsetX, 0);
+  ctx.lineTo(offsetX, h);
+  ctx.stroke();
+
+  // Labels dos eixos
+  ctx.fillStyle = "#000";
+  ctx.font = "bold 14px Segoe UI";
+  ctx.textAlign = "right";
+  ctx.fillText(axisLabels.x, w - 5, offsetY - 6);
+  ctx.textAlign = "left";
+  ctx.fillText(axisLabels.y, offsetX + 6, 10);
+
+  // Marcas horizontais (eixo x)
+  ctx.strokeStyle = "#ccc";
+  ctx.fillStyle = "#555";
+  ctx.font = "12px Arial";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+
+  const realStartX = -(offsetX / (80 * scale));
+  const realEndX = (w - offsetX) / (80 * scale);
+
+  for (let x = Math.floor(realStartX); x < realEndX; x += step) {
+    const px = offsetX + x * 80 * scale;
     ctx.beginPath();
-  
-    // Eixos principais
-    ctx.moveTo(0, cy);
-    ctx.lineTo(w, cy);
-    ctx.moveTo(cx, 0);
-    ctx.lineTo(cx, h);
+    ctx.moveTo(px, offsetY - 5);
+    ctx.lineTo(px, offsetY + 5);
     ctx.stroke();
-  
-    // Label dos eixos (x ou ζ / y ou η)
-    ctx.fillStyle = "#000";
-    ctx.font = "bold 14px Segoe UI";
-    ctx.textAlign = "right";
-    ctx.fillText(axisLabels.x, w - 5, cy - 6);
-    ctx.textAlign = "left";
-    ctx.fillText(axisLabels.y, cx + 6, 10);
-  
-    ctx.fillStyle = "#555";
-    ctx.font = "12px Arial";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "top";
-  
-    // Marcas horizontais (para o eixo X)
-    for (let x = cx + step; x < w; x += step) {
-      ctx.beginPath();
-      ctx.moveTo(x, cy - 5);
-      ctx.lineTo(x, cy + 5);
-      ctx.stroke();
-      ctx.fillText(((x - cx) / 80).toFixed(1), x, cy + 8);
-    }
-  
-    for (let x = cx - step; x > 0; x -= step) {
-      ctx.beginPath();
-      ctx.moveTo(x, cy - 5);
-      ctx.lineTo(x, cy + 5);
-      ctx.stroke();
-      ctx.fillText(((x - cx) / 80).toFixed(1), x, cy + 8);
-    }
-  
-    ctx.textAlign = "left";
-    ctx.textBaseline = "middle";
-  
-    // Marcas verticais (para o eixo Y)
-    for (let y = cy + step; y < h; y += step) {
-      ctx.beginPath();
-      ctx.moveTo(cx - 5, y);
-      ctx.lineTo(cx + 5, y);
-      ctx.stroke();
-      ctx.fillText((-(y - cy) / 80).toFixed(1) + "i", cx + 6, y); // Adicionando "i"
-    }
-  
-    for (let y = cy - step; y > 0; y -= step) {
-      ctx.beginPath();
-      ctx.moveTo(cx - 5, y);
-      ctx.lineTo(cx + 5, y);
-      ctx.stroke();
-      ctx.fillText((-(y - cy) / 80).toFixed(1) + "i", cx + 6, y); // Adicionando "i"
-    }
+    ctx.fillText(x.toFixed(1), px, offsetY + 8);
+  }
+
+  // Marcas verticais (eixo y)
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+
+  const realStartY = -(offsetY / (80 * scale));
+  const realEndY = (h - offsetY) / (80 * scale);
+
+  for (let y = Math.floor(realStartY); y < realEndY; y += step) {
+    const py = offsetY - y * 80 * scale;
+    ctx.beginPath();
+    ctx.moveTo(offsetX - 5, py);
+    ctx.lineTo(offsetX + 5, py);
+    ctx.stroke();
+    ctx.fillText(y.toFixed(1) + "i", offsetX + 6, py);
+  }
 }
-  
+
   
 function drawCircle() {
   ctx1.clearRect(0, 0, canvas1.width, canvas1.height);
-  drawAxes(ctx1, { x: "x", y: "y" });
+  drawAxes(ctx1, { x: "x", y: "y" }, offsetX1, offsetY1, scale1);
 
 
-  const cx = 200 + centerReal.x * 80;
-  const cy = 200 - centerReal.y * 80;
+
+  const cx = offsetX1 + centerReal.x * 80 * scale1;
+  const cy = offsetY1 - centerReal.y * 80 * scale1;
 
   ctx1.beginPath();
-  ctx1.arc(cx, cy, radius, 0, 2 * Math.PI);
+  ctx1.arc(cx, cy, radius * scale1, 0, 2 * Math.PI);
   ctx1.strokeStyle = "blue";
   ctx1.lineWidth = 2;
   ctx1.stroke();
@@ -146,24 +150,26 @@ function applyTransformation(zx, zy, type) {
   return { u: zx, v: zy };
 }
 
-
 function drawTransformed() {
   ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
-  drawAxes(ctx2, { x: "u", y: "v" });
+  drawAxes(ctx2, { x: "u", y: "v" }, offsetX2, offsetY2, scale2);
+
+
   const type = "joukowsky";
   const points = [];
 
-  const cx = 200 + centerReal.x * 80;
-  const cy = 200 - centerReal.y * 80;
-
+  // Percorre a circunferência no plano z
   for (let t = 0; t < 2 * Math.PI; t += 0.01) {
-    const x = cx + radius * Math.cos(t);
-    const y = cy + radius * Math.sin(t);
-    const zx = (x - 200) / 80;
-    const zy = (200 - y) / 80;
+    const zx = centerReal.x + (radius / 80) * Math.cos(t);
+    const zy = centerReal.y + (radius / 80) * Math.sin(t);
+
+    // Aplica a transformação de Joukowski
     const { u, v } = applyTransformation(zx, zy, type);
-    const tx = 200 + u * 80;
-    const ty = 200 - v * 80;
+
+    // Apenas aqui aplicamos o zoom e pan
+    const tx = offsetX2 + u * 80 * scale2;
+    const ty = offsetY2 - v * 80 * scale2;
+
     points.push({ x: tx, y: ty });
   }
 
@@ -177,7 +183,6 @@ function drawTransformed() {
   ctx2.lineWidth = 2;
   ctx2.stroke();
 }
-
 
 
 
@@ -263,3 +268,34 @@ predefinidoBtn.addEventListener("click", () => {
   // Avança o índice (loop circular)
   indiceAtual = (indiceAtual + 1) % predefinidos.length;
 });
+
+canvas2.addEventListener("wheel", function (e) {
+  e.preventDefault();
+  const zoomIntensity = 0.1;
+  const wheel = e.deltaY < 0 ? 1 : -1;
+  const zoom = Math.exp(wheel * zoomIntensity);
+
+  const rect = canvas2.getBoundingClientRect();
+  const mouseX = e.clientX - rect.left;
+  const mouseY = e.clientY - rect.top;
+
+  offsetX2 = mouseX - (mouseX - offsetX2) * zoom;
+  offsetY2 = mouseY - (mouseY - offsetY2) * zoom;
+  scale2 *= zoom;
+
+  drawTransformed();
+}, { passive: false }); // <- ESSENCIAL
+
+canvas1.addEventListener("wheel", function (e) {
+  e.preventDefault();
+  const zoom = e.deltaY < 0 ? 1.1 : 0.9;
+  const mouseX = e.offsetX;
+  const mouseY = e.offsetY;
+
+  offsetX1 = mouseX - (mouseX - offsetX1) * zoom;
+  offsetY1 = mouseY - (mouseY - offsetY1) * zoom;
+  scale1 *= zoom;
+
+  drawCircle();
+});
+
