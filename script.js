@@ -218,3 +218,48 @@ centerXInput.value = centerReal.x.toFixed(2);
 centerYInput.value = centerReal.y.toFixed(2);
 drawCircle();
 drawTransformed();
+const predefinidoBtn = document.getElementById("predefinido");
+
+// Lista de valores predefinidos
+const predefinidos = [
+  { x: 0.1, y: 0, r: 0.5 },
+  { x: 0.2, y: 1, r: 0.8 },
+  { x: 1, y: 1, r: 1},
+  { x: -2 , y: 3 , r: 4.2426 },
+  { x: 0.2, y: 1, r: 1.2806 },
+  { x: 0.1, y: 0.3, r: 0.9487 },
+  { x: -0.1, y: 0.1, r: 1.1045 },
+  { x: -0.2, y: 0.1, r: 1.2042},
+  { x: 0.3, y: -0.2, r: 0.6000 },
+  { x: -0.3, y: 0.5, r: 0.9000 },
+  { x: -0.5, y: -0.5, r: 1.1000 },
+  { x: 0.4, y: 0.6, r: 1.5000 },
+  { x: 0.5, y: 0, r: 2.0000 },
+  { x: -0.4, y: -0.3, r: 2.5000 },
+  { x: 0.2, y: -0.4, r: 3.0000 },
+  { x: -0.1, y: 0.2, r: 3.5000 },
+ 
+];
+
+let indiceAtual = 0;
+
+predefinidoBtn.addEventListener("click", () => {
+  const valor = predefinidos[indiceAtual];
+
+  // Atualiza os valores
+  centerReal.x = valor.x;
+  centerReal.y = valor.y;
+  radius = valor.r * 80;
+
+  // Atualiza os inputs
+  centerXInput.value = valor.x.toFixed(2);
+  centerYInput.value = valor.y.toFixed(2);
+  radiusSlider.value = radius;
+  radiusValue.textContent = valor.r.toFixed(2);
+
+  drawCircle();
+  drawTransformed();
+
+  // Avança o índice (loop circular)
+  indiceAtual = (indiceAtual + 1) % predefinidos.length;
+});

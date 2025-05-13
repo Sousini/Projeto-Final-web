@@ -113,12 +113,30 @@ canvas {
     display: flex;
     flex-direction: column;
     align-items: center;
-}
-
-.radius-control span {
+  }
+  
+  .radius-control span {
     margin-top: 4px;
     font-size: 14px;
-}
+  }
+  
+  .valores-predefinidos {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .valores-predefinidos button {
+    padding: 6px 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+
 
 
 
