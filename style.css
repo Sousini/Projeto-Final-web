@@ -114,35 +114,60 @@ canvas {
     display: flex;
     flex-direction: column;
     align-items: center;
-  }
-  
-  .radius-control span {
+}
+
+.radius-control span {
     margin-top: 4px;
     font-size: 14px;
-  }
-  
-  .valores-predefinidos {
+}
+
+.valores-predefinidos {
     margin-top: 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 5px;
-  }
-  
-  .valores-predefinidos button {
+}
+
+.valores-predefinidos button {
     padding: 6px 10px;
     font-size: 14px;
     border: 1px solid #ccc;
     border-radius: 4px;
     cursor: pointer;
-  }
-  
+}
+
+.custom-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.custom-checkbox input {
+    opacity: 0;
+    /* Esconde o checkbox nativo */
+}
+
+.checkmark {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #007BFF;
+    display: inline-block;
+    border-radius: 3px;
+}
+
+.custom-checkbox input:checked+.checkmark {
+    background-color: #007BFF;
+}
+
 
 
 
 
 /* Garantindo que o canvas tenha uma margem adequada */
-#canvas1, #canvas2 {
+#canvas1,
+#canvas2 {
     margin-top: 20px;
 }
 
@@ -188,11 +213,13 @@ canvas {
         gap: 20px;
     }
 
-    .radius-control, .center-control {
+    .radius-control,
+    .center-control {
         flex-basis: 100%;
     }
 
-    .center-control input, .center-control span {
+    .center-control input,
+    .center-control span {
         flex-basis: 100%;
         text-align: left;
     }

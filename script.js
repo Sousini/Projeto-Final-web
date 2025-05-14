@@ -149,11 +149,59 @@ function applyTransformation(zx, zy, type) {
   }
   return { u: zx, v: zy };
 }
+function generateStreamlinesZeta() {
+  const streamlines = [];
+  const thetaSteps = 100;
+  const rSteps = 20;
+  const rMin = (radius / 80) + 0.05;
+  const rMax = (radius / 80) * 3;
+
+  for (let j = 0; j < rSteps; j++) {
+    const r = rMin + j * (rMax - rMin) / (rSteps - 1);
+
+    const streamline = [];
+
+    for (let i = 0; i <= thetaSteps; i++) {
+      const theta = i * 2 * Math.PI / thetaSteps;
+      const zx = centerReal.x + r * Math.cos(theta);
+      const zy = centerReal.y + r * Math.sin(theta);
+
+      const { u, v } = applyTransformation(zx, zy, "joukowsky");
+
+      const tx = offsetX2 + u * 80 * scale2;
+      const ty = offsetY2 - v * 80 * scale2;
+
+      streamline.push({ x: tx, y: ty });
+    }
+
+    streamlines.push(streamline);
+  }
+
+  return streamlines;
+}
+
+function drawStreamlines() {
+  const streamlines = generateStreamlinesZeta();
+
+  ctx2.strokeStyle = "#0077bb";
+  ctx2.lineWidth = 1;
+
+  for (const streamline of streamlines) {
+    ctx2.beginPath();
+    ctx2.moveTo(streamline[0].x, streamline[0].y);
+    for (let i = 1; i < streamline.length; i++) {
+      ctx2.lineTo(streamline[i].x, streamline[i].y);
+    }
+    ctx2.stroke();
+  }
+}
+
 
 function drawTransformed() {
   ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
   drawAxes(ctx2, { x: "u", y: "v" }, offsetX2, offsetY2, scale2);
 
+  drawStreamlines(); // <- Adicionado aqui
 
   const type = "joukowsky";
   const points = [];
@@ -163,10 +211,8 @@ function drawTransformed() {
     const zx = centerReal.x + (radius / 80) * Math.cos(t);
     const zy = centerReal.y + (radius / 80) * Math.sin(t);
 
-    // Aplica a transformação de Joukowski
     const { u, v } = applyTransformation(zx, zy, type);
 
-    // Apenas aqui aplicamos o zoom e pan
     const tx = offsetX2 + u * 80 * scale2;
     const ty = offsetY2 - v * 80 * scale2;
 
@@ -183,6 +229,7 @@ function drawTransformed() {
   ctx2.lineWidth = 2;
   ctx2.stroke();
 }
+
 
 
 
