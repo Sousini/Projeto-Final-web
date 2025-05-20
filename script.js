@@ -202,26 +202,62 @@ function drawStreamlines() {
   const alpha = Math.atan2(k, h + R);
   const Gamma = 4 * Math.PI * U * R * Math.sin(alpha);
 
-  ctx2.clearRect(0, 0, width, height); // Remova se já houver limpeza em drawTransformed
+  ctx2.clearRect(0, 0, width, height);
+  drawAxes(ctx2, { x: "u", y: "v" }, offsetX2, offsetY2, scale2);
 
-  // Use offsetX2, offsetY2 e scale2 do canvas2!
-  const step = 0.1;
-  for (let y = -2.5; y <= 2.5; y += step) {
-    for (let x = -3; x <= 3; x += step) {
-      const z = [x, y];
-      const zShifted = [x - h, y - k];
-      if (complexAbs(zShifted) < R) continue;
+  const step = 0.01; // passo da integração
+  const maxLength = 300; // máximo de passos por linha
+  const startYs = [];
+
+  // Pontos de partida das linhas (como no MATLAB: vários y)
+  for (let y = -2.5; y <= 2.5; y += 0.2) {
+    startYs.push(y);
+  }
+
+  for (const y0 of startYs) {
+    drawStreamline([ -3, y0 ], R, h, k, Gamma, +1);
+    drawStreamline([ 3, y0 ], R, h, k, Gamma, -1);
+  }
+
+  function drawStreamline(start, R, h, k, Gamma, direction = 1) {
+    const path = [];
+    let z = [start[0], start[1]];
+    for (let i = 0; i < maxLength; i++) {
+      const zShifted = [z[0] - h, z[1] - k];
+      if (complexAbs(zShifted) < R) break;
 
       const w = joukowski(zShifted);
+      const sx = offsetX2 + w[0] * 80 * scale2;
+      const sy = offsetY2 - w[1] * 80 * scale2;
+      path.push([sx, sy]);
+
+      // Derivada da função corrente: v = grad(psi)⊥ = [-∂ψ/∂y, ∂ψ/∂x]
+      const dx = 1e-4;
       const psi = streamFunction(zShifted, R, Gamma);
+      const psiX = (streamFunction([zShifted[0] + dx, zShifted[1]], R, Gamma) - psi) / dx;
+      const psiY = (streamFunction([zShifted[0], zShifted[1] + dx], R, Gamma) - psi) / dx;
 
-      // Aplicar transformações do canvas2 (scale2 e offset)
-      const screenX = offsetX2 + w[0] * 80 * scale2; // Substitua centerX por offsetX2
-      const screenY = offsetY2 - w[1] * 80 * scale2; // Substitua centerY por offsetY2
+      const vx = +psiY;
+      const vy = -psiX;
 
-      ctx2.fillStyle = `hsl(${(psi * 10) % 360}, 100%, 50%)`;
-      ctx2.fillRect(screenX, screenY, 1, 1);
+      const mag = Math.hypot(vx, vy);
+      if (mag < 1e-5) break;
+
+      z = [
+        z[0] + direction * (vx / mag) * step,
+        z[1] + direction * (vy / mag) * step
+      ];
     }
+
+    // Desenha a linha
+    ctx2.beginPath();
+    ctx2.moveTo(path[0][0], path[0][1]);
+    for (let i = 1; i < path.length; i++) {
+      ctx2.lineTo(path[i][0], path[i][1]);
+    }
+    ctx2.strokeStyle = "rgba(0, 150, 255, 0.7)";
+    ctx2.lineWidth = 1;
+    ctx2.stroke();
   }
 }
 
@@ -231,7 +267,7 @@ function drawTransformed() {
   ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
   drawAxes(ctx2, { x: "u", y: "v" }, offsetX2, offsetY2, scale2);
   drawCircle();
-  drawStreamlines();
+ 
   
  // <- Adicionado aqui
 
@@ -261,6 +297,42 @@ function drawTransformed() {
   ctx2.lineWidth = 2;
   ctx2.stroke();
 }
+const fluxoCheckbox = document.getElementById("fluxo");
+
+function drawTransformed() {
+  ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
+  drawAxes(ctx2, { x: "u", y: "v" }, offsetX2, offsetY2, scale2);
+  drawCircle();
+
+  if (fluxoCheckbox.checked) {
+    drawStreamlines();
+  }
+
+  const type = "joukowsky";
+  const points = [];
+
+  for (let t = 0; t < 2 * Math.PI; t += 0.01) {
+    const zx = centerReal.x + (radius / 80) * Math.cos(t);
+    const zy = centerReal.y + (radius / 80) * Math.sin(t);
+    const { u, v } = applyTransformation(zx, zy, type);
+    const tx = offsetX2 + u * 80 * scale2;
+    const ty = offsetY2 - v * 80 * scale2;
+    points.push({ x: tx, y: ty });
+  }
+
+  ctx2.beginPath();
+  ctx2.moveTo(points[0].x, points[0].y);
+  for (let i = 1; i < points.length; i++) {
+    ctx2.lineTo(points[i].x, points[i].y);
+  }
+  ctx2.closePath();
+  ctx2.strokeStyle = "red";
+  ctx2.lineWidth = 2;
+  ctx2.stroke();
+}
+
+fluxoCheckbox.addEventListener("change", drawTransformed);
+
 
 
 
@@ -327,28 +399,25 @@ const predefinidos = [
  
 ];
 
-let indiceAtual = 0;
+
+
+let predefIndex = 0;
 
 predefinidoBtn.addEventListener("click", () => {
-  const valor = predefinidos[indiceAtual];
+  const p = predefinidos[predefIndex];
+  centerReal.x = p.x;
+  centerReal.y = p.y;
+  radius = p.r * 80;
 
-  // Atualiza os valores
-  centerReal.x = valor.x;
-  centerReal.y = valor.y;
-  radius = valor.r * 80;
-
-  // Atualiza os inputs
-  centerXInput.value = valor.x.toFixed(2);
-  centerYInput.value = valor.y.toFixed(2);
+  centerXInput.value = centerReal.x.toFixed(2);
+  centerYInput.value = centerReal.y.toFixed(2);
   radiusSlider.value = radius;
-  radiusValue.textContent = valor.r.toFixed(2);
+  radiusValue.textContent = (radius / 80).toFixed(2);
 
   drawCircle();
   drawTransformed();
- 
 
-  // Avança o índice (loop circular)
-  indiceAtual = (indiceAtual + 1) % predefinidos.length;
+  predefIndex = (predefIndex + 1) % predefinidos.length;
 });
 
 canvas2.addEventListener("wheel", function (e) {
