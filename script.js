@@ -149,59 +149,91 @@ function applyTransformation(zx, zy, type) {
   }
   return { u: zx, v: zy };
 }
-function generateStreamlinesZeta() {
-  const streamlines = [];
-  const thetaSteps = 100;
-  const rSteps = 20;
-  const rMin = (radius / 80) + 0.05;
-  const rMax = (radius / 80) * 3;
+const width = canvas2.width;
+const height = canvas2.height;
+const scale = 50;
+const centerX = width / 2;
+const centerY = height / 2;
 
-  for (let j = 0; j < rSteps; j++) {
-    const r = rMin + j * (rMax - rMin) / (rSteps - 1);
+const U = 1.0;
 
-    const streamline = [];
+function complexAdd(a, b) {
+  return [a[0] + b[0], a[1] + b[1]];
+}
 
-    for (let i = 0; i <= thetaSteps; i++) {
-      const theta = i * 2 * Math.PI / thetaSteps;
-      const zx = centerReal.x + r * Math.cos(theta);
-      const zy = centerReal.y + r * Math.sin(theta);
+function complexSub(a, b) {
+  return [a[0] - b[0], a[1] - b[1]];
+}
 
-      const { u, v } = applyTransformation(zx, zy, "joukowsky");
+function complexMul(a, b) {
+  return [
+    a[0] * b[0] - a[1] * b[1],
+    a[0] * b[1] + a[1] * b[0],
+  ];
+}
 
-      const tx = offsetX2 + u * 80 * scale2;
-      const ty = offsetY2 - v * 80 * scale2;
+function complexDiv(a, b) {
+  const denom = b[0] ** 2 + b[1] ** 2;
+  return [
+    (a[0] * b[0] + a[1] * b[1]) / denom,
+    (a[1] * b[0] - a[0] * b[1]) / denom,
+  ];
+}
 
-      streamline.push({ x: tx, y: ty });
-    }
+function complexAbs(z) {
+  return Math.sqrt(z[0] ** 2 + z[1] ** 2);
+}
 
-    streamlines.push(streamline);
-  }
+function joukowski(z) {
+  const inv = complexDiv([1, 0], z);
+  return complexAdd(z, inv);
+}
 
-  return streamlines;
+function streamFunction(z, R, Gamma) {
+  const r2 = z[0] ** 2 + z[1] ** 2;
+  const theta = Math.atan2(z[1], z[0]);
+  return U * r2 * Math.sin(theta) - (Gamma / (2 * Math.PI)) * Math.log(r2);
 }
 
 function drawStreamlines() {
-  const streamlines = generateStreamlinesZeta();
+  const R = radius / 80;
+  const h = centerReal.x;
+  const k = centerReal.y;
+  const alpha = Math.atan2(k, h + R);
+  const Gamma = 4 * Math.PI * U * R * Math.sin(alpha);
 
-  ctx2.strokeStyle = "#0077bb";
-  ctx2.lineWidth = 1;
+  ctx2.clearRect(0, 0, width, height); // Remova se já houver limpeza em drawTransformed
 
-  for (const streamline of streamlines) {
-    ctx2.beginPath();
-    ctx2.moveTo(streamline[0].x, streamline[0].y);
-    for (let i = 1; i < streamline.length; i++) {
-      ctx2.lineTo(streamline[i].x, streamline[i].y);
+  // Use offsetX2, offsetY2 e scale2 do canvas2!
+  const step = 0.1;
+  for (let y = -2.5; y <= 2.5; y += step) {
+    for (let x = -3; x <= 3; x += step) {
+      const z = [x, y];
+      const zShifted = [x - h, y - k];
+      if (complexAbs(zShifted) < R) continue;
+
+      const w = joukowski(zShifted);
+      const psi = streamFunction(zShifted, R, Gamma);
+
+      // Aplicar transformações do canvas2 (scale2 e offset)
+      const screenX = offsetX2 + w[0] * 80 * scale2; // Substitua centerX por offsetX2
+      const screenY = offsetY2 - w[1] * 80 * scale2; // Substitua centerY por offsetY2
+
+      ctx2.fillStyle = `hsl(${(psi * 10) % 360}, 100%, 50%)`;
+      ctx2.fillRect(screenX, screenY, 1, 1);
     }
-    ctx2.stroke();
   }
 }
+
 
 
 function drawTransformed() {
   ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
   drawAxes(ctx2, { x: "u", y: "v" }, offsetX2, offsetY2, scale2);
-
-  drawStreamlines(); // <- Adicionado aqui
+  drawCircle();
+  drawStreamlines();
+  
+ // <- Adicionado aqui
 
   const type = "joukowsky";
   const points = [];
@@ -259,6 +291,7 @@ canvas1.addEventListener("mousemove", (e) => {
   centerYInput.value = centerReal.y.toFixed(2);
   drawCircle();
   drawTransformed();
+  
 });
 
 canvas1.addEventListener("mouseup", () => dragging = false);
@@ -270,6 +303,7 @@ centerXInput.value = centerReal.x.toFixed(2);
 centerYInput.value = centerReal.y.toFixed(2);
 drawCircle();
 drawTransformed();
+
 const predefinidoBtn = document.getElementById("predefinido");
 
 // Lista de valores predefinidos
@@ -311,6 +345,7 @@ predefinidoBtn.addEventListener("click", () => {
 
   drawCircle();
   drawTransformed();
+ 
 
   // Avança o índice (loop circular)
   indiceAtual = (indiceAtual + 1) % predefinidos.length;
@@ -331,6 +366,7 @@ canvas2.addEventListener("wheel", function (e) {
   scale2 *= zoom;
 
   drawTransformed();
+  
 }, { passive: false }); // <- ESSENCIAL
 
 canvas1.addEventListener("wheel", function (e) {
