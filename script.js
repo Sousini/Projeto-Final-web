@@ -1,10 +1,14 @@
 const canvas1 = document.getElementById("canvas1");
 const canvas2 = document.getElementById("canvas2");
+const canvas3 = document.getElementById("canvas3");
 const ctx1 = canvas1.getContext("2d");
 const ctx2 = canvas2.getContext("2d");
+const ctx3 = canvas3.getContext("2d");
 const radiusSlider = document.getElementById("radiusSlider");
+const radiusSlider2 = document.getElementById("radiusSlider2");
 const centerXInput = document.getElementById("centerX");
 const centerYInput = document.getElementById("centerY");
+const fluxoCheckbox = document.getElementById("fluxo");
 
 let radius = 80;
 let dragging = false;
@@ -15,18 +19,29 @@ let scale2 = 1;
 let offsetX1 = 200;
 let offsetY1 = 200;
 let scale1 = 1;
+let offsetX3 = 200;
+let offsetY3 = 200;
+let scale3 = 1;
+let fluxoAtivo = false;
 
 
 // Estado do centro em coordenadas reais
 let centerReal = { x: 0, y: 0 };
 
 const radiusValue = document.getElementById("radiusValue");
+const radiusValue2 = document.getElementById("radiusValue2");
 
 radiusSlider.addEventListener("input", (e) => {
   radius = parseFloat(e.target.value);
   radiusValue.textContent = (radius / 80).toFixed(2);
   drawCircle();
   drawTransformed();
+});
+
+radiusSlider2.addEventListener("input", (e) => {
+  let r = parseFloat(e.target.value);
+  radiusValue2.textContent = (r / 80).toFixed(2);
+  elipses(r);
 });
 
 centerXInput.addEventListener("input", (e) => {
@@ -40,6 +55,54 @@ centerYInput.addEventListener("input", (e) => {
   drawCircle();
   drawTransformed();
 });
+
+function elipses(r) {
+  ctx3.clearRect(0, 0, canvas3.width, canvas3.height);
+  drawAxes(ctx3, { x: "x", y: "y" }, offsetX3, offsetY3, scale3);
+
+  ctx3.beginPath();
+  ctx3.arc(offsetX3, offsetY3, r * scale1, 0, 2 * Math.PI);
+  ctx3.strokeStyle = "black";
+  ctx3.lineWidth = 2;
+  ctx3.stroke();
+
+  let points = [];
+
+  for (let i = 0; i <= 2 * Math.PI; i += 0.05) {
+    const x = (r / 80) * Math.cos(i);
+    const y = (r / 80) * Math.sin(i);
+
+    const { u, v } = applyTransformation(x, y, "joukowsky");
+
+    const tx = offsetX3 + (u * -1) * 80 * scale3;
+    const ty = offsetY3 - v * 80 * scale3;
+
+    points.push({ x: tx, y: ty });
+  }
+
+  ctx3.beginPath();
+  ctx3.moveTo(points[0].x, points[0].y);
+  for (let i = 1; i < points.length; i++) {
+    ctx3.lineTo(points[i].x, points[i].y);
+  }
+  ctx3.closePath();
+  ctx3.strokeStyle = "red";
+  ctx3.lineWidth = 3;
+  ctx3.stroke();
+
+
+  [{ x: -2, y: 0 }, { x: 2, y: 0 }].forEach(foco => {
+    ctx3.beginPath();
+    ctx3.arc(offsetX3 + foco.x * 80 * scale3,
+      offsetY3 + foco.y * 80 * scale3,
+      3, 0, 2 * Math.PI
+    );
+
+    ctx3.fillStyle = "blue";
+    ctx3.fill();
+  })
+
+}
 
 function drawAxes(ctx, axisLabels = { x: "x", y: "y" }, offsetX = 200, offsetY = 200, scale = 1) {
   const w = ctx.canvas.width;
@@ -106,7 +169,7 @@ function drawAxes(ctx, axisLabels = { x: "x", y: "y" }, offsetX = 200, offsetY =
   }
 }
 
-  
+
 function drawCircle() {
   ctx1.clearRect(0, 0, canvas1.width, canvas1.height);
   drawAxes(ctx1, { x: "x", y: "y" }, offsetX1, offsetY1, scale1);
@@ -131,20 +194,20 @@ function drawCircle() {
 }
 
 function drawLabels(ctx) {
-    ctx.fillStyle = "#000";
-    ctx.font = "14px Segoe UI";
-  
-    ctx.fillText(`Centro: ${centerReal.x.toFixed(2)}, ${centerReal.y.toFixed(2)}`, 10, 20);
-    ctx.fillText(`Raio: ${(radius / 80).toFixed(2)}`, 10, 40);
+  ctx.fillStyle = "#000";
+  ctx.font = "14px Segoe UI";
+
+  ctx.fillText(`Centro: ${centerReal.x.toFixed(2)}, ${centerReal.y.toFixed(2)}`, 10, 20);
+  ctx.fillText(`Raio: ${(radius / 80).toFixed(2)}`, 10, 40);
 }
-  
+
 
 function applyTransformation(zx, zy, type) {
   if (type === "joukowsky") {
-    const denom = zx ** 2 + zy ** 2 || 1e-10;
+    const denom = zx ** 2 + zy ** 2;
     return {
-      u: zx + zx / denom,
-      v: zy - zy / denom
+      u: zx * (zx ** 2 + zy ** 2 + 1) / denom,
+      v: zy * (zx ** 2 + zy ** 2 - 1) / denom
     };
   }
   return { u: zx, v: zy };
@@ -202,62 +265,26 @@ function drawStreamlines() {
   const alpha = Math.atan2(k, h + R);
   const Gamma = 4 * Math.PI * U * R * Math.sin(alpha);
 
-  ctx2.clearRect(0, 0, width, height);
-  drawAxes(ctx2, { x: "u", y: "v" }, offsetX2, offsetY2, scale2);
+  ctx2.clearRect(0, 0, width, height); // Remova se já houver limpeza em drawTransformed
 
-  const step = 0.01; // passo da integração
-  const maxLength = 300; // máximo de passos por linha
-  const startYs = [];
+  // Use offsetX2, offsetY2 e scale2 do canvas2!
+  const step = 0.1;
+  for (let y = -2.5; y <= 2.5; y += step) {
+    for (let x = -3; x <= 3; x += step) {
+      const z = [x, y];
+      const zShifted = [x + h, y + k];
+      if (complexAbs([x - h, y - k]) < R + Math.pow(10, -5)) continue;
 
-  // Pontos de partida das linhas (como no MATLAB: vários y)
-  for (let y = -2.5; y <= 2.5; y += 0.2) {
-    startYs.push(y);
-  }
-
-  for (const y0 of startYs) {
-    drawStreamline([ -3, y0 ], R, h, k, Gamma, +1);
-    drawStreamline([ 3, y0 ], R, h, k, Gamma, -1);
-  }
-
-  function drawStreamline(start, R, h, k, Gamma, direction = 1) {
-    const path = [];
-    let z = [start[0], start[1]];
-    for (let i = 0; i < maxLength; i++) {
-      const zShifted = [z[0] - h, z[1] - k];
-      if (complexAbs(zShifted) < R) break;
-
-      const w = joukowski(zShifted);
-      const sx = offsetX2 + w[0] * 80 * scale2;
-      const sy = offsetY2 - w[1] * 80 * scale2;
-      path.push([sx, sy]);
-
-      // Derivada da função corrente: v = grad(psi)⊥ = [-∂ψ/∂y, ∂ψ/∂x]
-      const dx = 1e-4;
+      const w = applyTransformation(z[0], z[1], "joukowsky");
       const psi = streamFunction(zShifted, R, Gamma);
-      const psiX = (streamFunction([zShifted[0] + dx, zShifted[1]], R, Gamma) - psi) / dx;
-      const psiY = (streamFunction([zShifted[0], zShifted[1] + dx], R, Gamma) - psi) / dx;
 
-      const vx = +psiY;
-      const vy = -psiX;
+      // Aplicar transformações do canvas2 (scale2 e offset)
+      const screenX = offsetX2 + (w.u * -1) * 80 * scale2; // Substitua centerX por offsetX2
+      const screenY = offsetY2 - w.v * 80 * scale2; // Substitua centerY por offsetY2
 
-      const mag = Math.hypot(vx, vy);
-      if (mag < 1e-5) break;
-
-      z = [
-        z[0] + direction * (vx / mag) * step,
-        z[1] + direction * (vy / mag) * step
-      ];
+      ctx2.fillStyle = `hsl(${(psi * 10) % 360}, 100%, 50%)`;
+      ctx2.fillRect(screenX, screenY, 3, 3);
     }
-
-    // Desenha a linha
-    ctx2.beginPath();
-    ctx2.moveTo(path[0][0], path[0][1]);
-    for (let i = 1; i < path.length; i++) {
-      ctx2.lineTo(path[i][0], path[i][1]);
-    }
-    ctx2.strokeStyle = "rgba(0, 150, 255, 0.7)";
-    ctx2.lineWidth = 1;
-    ctx2.stroke();
   }
 }
 
@@ -267,9 +294,11 @@ function drawTransformed() {
   ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
   drawAxes(ctx2, { x: "u", y: "v" }, offsetX2, offsetY2, scale2);
   drawCircle();
- 
-  
- // <- Adicionado aqui
+  if (fluxoAtivo) {
+    drawStreamlines();
+  }
+
+  // <- Adicionado aqui
 
   const type = "joukowsky";
   const points = [];
@@ -281,7 +310,7 @@ function drawTransformed() {
 
     const { u, v } = applyTransformation(zx, zy, type);
 
-    const tx = offsetX2 + u * 80 * scale2;
+    const tx = offsetX2 + (u * -1) * 80 * scale2;
     const ty = offsetY2 - v * 80 * scale2;
 
     points.push({ x: tx, y: ty });
@@ -297,42 +326,6 @@ function drawTransformed() {
   ctx2.lineWidth = 2;
   ctx2.stroke();
 }
-const fluxoCheckbox = document.getElementById("fluxo");
-
-function drawTransformed() {
-  ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
-  drawAxes(ctx2, { x: "u", y: "v" }, offsetX2, offsetY2, scale2);
-  drawCircle();
-
-  if (fluxoCheckbox.checked) {
-    drawStreamlines();
-  }
-
-  const type = "joukowsky";
-  const points = [];
-
-  for (let t = 0; t < 2 * Math.PI; t += 0.01) {
-    const zx = centerReal.x + (radius / 80) * Math.cos(t);
-    const zy = centerReal.y + (radius / 80) * Math.sin(t);
-    const { u, v } = applyTransformation(zx, zy, type);
-    const tx = offsetX2 + u * 80 * scale2;
-    const ty = offsetY2 - v * 80 * scale2;
-    points.push({ x: tx, y: ty });
-  }
-
-  ctx2.beginPath();
-  ctx2.moveTo(points[0].x, points[0].y);
-  for (let i = 1; i < points.length; i++) {
-    ctx2.lineTo(points[i].x, points[i].y);
-  }
-  ctx2.closePath();
-  ctx2.strokeStyle = "red";
-  ctx2.lineWidth = 2;
-  ctx2.stroke();
-}
-
-fluxoCheckbox.addEventListener("change", drawTransformed);
-
 
 
 
@@ -363,13 +356,35 @@ canvas1.addEventListener("mousemove", (e) => {
   centerYInput.value = centerReal.y.toFixed(2);
   drawCircle();
   drawTransformed();
-  
+
 });
+
+
 
 canvas1.addEventListener("mouseup", () => dragging = false);
 canvas1.addEventListener("mouseleave", () => dragging = false);
+fluxoCheckbox.addEventListener("change", () => {
+  fluxoAtivo = fluxoCheckbox.checked;
+
+
+  // Altera os limites do raio dinamicamente com base no estado do fluxo
+  if (fluxoAtivo) {
+    // Por exemplo: limites mais restritos
+    radiusSlider.min = 80;
+    radiusSlider.max = 150;
+
+  } else {
+    // Limites normais
+    radiusSlider.min = 10;
+    radiusSlider.max = 300;
+  }
+
+ 
+  drawTransformed();
+});
 
 // Inicialização
+elipses(80);
 radiusValue.textContent = (radius / 80).toFixed(2);
 centerXInput.value = centerReal.x.toFixed(2);
 centerYInput.value = centerReal.y.toFixed(2);
@@ -382,12 +397,12 @@ const predefinidoBtn = document.getElementById("predefinido");
 const predefinidos = [
   { x: 0.1, y: 0, r: 0.5 },
   { x: 0.2, y: 1, r: 0.8 },
-  { x: 1, y: 1, r: 1},
-  { x: -2 , y: 3 , r: 4.2426 },
+  { x: 1, y: 1, r: 1 },
+  { x: -2, y: 3, r: 4.2426 },
   { x: 0.2, y: 1, r: 1.2806 },
   { x: 0.1, y: 0.3, r: 0.9487 },
   { x: -0.1, y: 0.1, r: 1.1045 },
-  { x: -0.2, y: 0.1, r: 1.2042},
+  { x: -0.2, y: 0.1, r: 1.2042 },
   { x: 0.3, y: -0.2, r: 0.6000 },
   { x: -0.3, y: 0.5, r: 0.9000 },
   { x: -0.5, y: -0.5, r: 1.1000 },
@@ -396,28 +411,31 @@ const predefinidos = [
   { x: -0.4, y: -0.3, r: 2.5000 },
   { x: 0.2, y: -0.4, r: 3.0000 },
   { x: -0.1, y: 0.2, r: 3.5000 },
- 
+
 ];
 
-
-
-let predefIndex = 0;
+let indiceAtual = 0;
 
 predefinidoBtn.addEventListener("click", () => {
-  const p = predefinidos[predefIndex];
-  centerReal.x = p.x;
-  centerReal.y = p.y;
-  radius = p.r * 80;
+  const valor = predefinidos[indiceAtual];
 
-  centerXInput.value = centerReal.x.toFixed(2);
-  centerYInput.value = centerReal.y.toFixed(2);
+  // Atualiza os valores
+  centerReal.x = valor.x;
+  centerReal.y = valor.y;
+  radius = valor.r * 80;
+
+  // Atualiza os inputs
+  centerXInput.value = valor.x.toFixed(2);
+  centerYInput.value = valor.y.toFixed(2);
   radiusSlider.value = radius;
-  radiusValue.textContent = (radius / 80).toFixed(2);
+  radiusValue.textContent = valor.r.toFixed(2);
 
   drawCircle();
   drawTransformed();
 
-  predefIndex = (predefIndex + 1) % predefinidos.length;
+
+  // Avança o índice (loop circular)
+  indiceAtual = (indiceAtual + 1) % predefinidos.length;
 });
 
 canvas2.addEventListener("wheel", function (e) {
@@ -435,7 +453,7 @@ canvas2.addEventListener("wheel", function (e) {
   scale2 *= zoom;
 
   drawTransformed();
-  
+
 }, { passive: false }); // <- ESSENCIAL
 
 canvas1.addEventListener("wheel", function (e) {

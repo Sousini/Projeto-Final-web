@@ -61,6 +61,16 @@
         semelhante a um elipse no plano \( w \). No caso particular em que \( c = 1 \), obtemos: \[ w = 2 \cos\theta \]
         que corresponde a um segmento de reta entre -2 e 2, uma vez que a parte imaginária se anula.
       </p>
+      <div class="canvas-container">
+        <canvas id="canvas3" width="400" height="400"></canvas>
+        <div class="controls">
+          <div class="radius-control">
+          <label for="radiusSlider2">Raio</label>
+          <input type="range" id="radiusSlider2" min="20" max="400" value="80" />
+          <span id="radiusValue2">1.00</span>
+        </div>
+        </div>
+      </div>
     </section>
 
     <section id="app">
@@ -73,15 +83,15 @@
       <div class="controls">
         <div class="radius-control">
           <label for="radiusSlider">Raio</label>
-          <input type="range" id="radiusSlider" min="20" max="150" value="80" />
+          <input type="range" id="radiusSlider" min="20" max="160" value="80" />
           <span id="radiusValue">1.00</span>
       
           <div class="valores-predefinidos">
             <label>Valores Predefinidos
               <button id="predefinido">Predefinidos</button>
             </label>
-          
-            <div class="fluxo-ativar">
+            
+             <div class="fluxo-ativar">
               <label class="custom-checkbox">
                   <input type="checkbox" id="fluxo">
                   <span class="checkmark"></span>
@@ -102,7 +112,7 @@
     </section>
   </main>
 
-  <script src="script.js"></script>
+  <script defer src="script.js"></script>
 </body>
 
 </html>
