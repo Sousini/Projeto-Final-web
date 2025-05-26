@@ -79,6 +79,19 @@ section {
     visibility: hidden;
 }
 
+.imagens {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+}
+
+.imagens img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
 .canvas-container {
     display: flex;
     justify-content: center;

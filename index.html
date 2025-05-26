@@ -41,13 +41,18 @@
         holomorfas, ou seja, funções que são deriváveis em um domínio aberto. Como consequência,
         são contínuas e suaves, no sentido em que não apresenta descontinuidades, cantos ou mudanças bruscas de direção.
       </p>
+      <div class="imagens">
+        <img src="img/grelha.png" />
+        <img src="img/sen(z).png" />
+      </div>
 
       <h2>Transformação de Joukowski</h2>
       <p>Como sabemos a transformação é uma função racional definida por $$w = z + \frac{c²}{z}$$ sendo utilizada em
         aerodinâmica para transformar círculos no plano \(z\) em perfis aerodinâmicos no plano \(w\).
         Neste projeto, consideramos o caso particular com o \(c = 1 \), resultando a seguinte função: $$ w = z +
         \frac{1}{z}$$
-        Esta função é uma transformação conforme em \(\mathbb C \) \ { -1, 0, 1} pois quando derivamos a função \(w\), obtemos
+        Esta função é uma transformação conforme em \(\mathbb C \) \ { -1, 0, 1} pois quando derivamos a função \(w\),
+        obtemos
         $$w' = 1 - \frac{1}{z²}$$ e verificamos que se anula nos pontos
         \(z = 1\) e \(z = -1\). Além disso, a função não está definida em \(z = 0\), logo também não é conforme nesse
         ponto.
@@ -60,7 +65,8 @@
         Portanto, a imagem de um círculo no plano \( z \) sob a transformação de Joukowski é, em geral, uma curva
         semelhante a um elipse no plano \( w \). No caso particular em que \( c = 1 \), obtemos: \[ w = 2 \cos\theta \]
         que corresponde a um segmento de reta entre -2 e 2, uma vez que a parte imaginária se anula.
-        <p>Também podemos estudar o comportamento inverso da transformação ao resolver a equação \(w = z + \frac{1}{z}\) para \(z\).
+      <p>Também podemos estudar o comportamento inverso da transformação ao resolver a equação \(w = z + \frac{1}{z}\)
+        para \(z\).
         Multiplicando ambos os lados por \(z\), obtemos a equação quadrática: $$z² - wz + 1 = 0$$
         cujas soluções são dadas por: $$z = \frac{w \pm \sqrt{w² - 4}}{2}$$
         Este resultado mostra que, para cada \(w \in \mathbb C \setminus[-2,2]\), existem dois valores distintos
@@ -68,23 +74,25 @@
         portanto, à imagem do círculo \(|z| = 1\), onde a transformação deixa de ser injetiva.
         Fora do segmento de reta, o plano \(z\) pode ser dividido em duas regiões - interior (\(|z| \lt 1\))
         e exterior (\(|z| \gt 1\)) - que são mapeadas bijetivamente sobre o plano \(w\).
-        Adicionalmente, é interessante observar o efeito da transformação em círculos concêntricos de raio \(\pmb R \neq 1\).
-        Considerando \(z = \pmb {R}e^{i\theta}\), com \(\pmb R \gt 1\), e aplicando a transformação de Joukowski, 
+        Adicionalmente, é interessante observar o efeito da transformação em círculos concêntricos de raio \(\pmb R \neq
+        1\).
+        Considerando \(z = \pmb {R}e^{i\theta}\), com \(\pmb R \gt 1\), e aplicando a transformação de Joukowski,
         obtemos: $$w = \pmb{R}e^{i\theta} + \frac{1}{\pmb R}e^{-i\theta}$$
         Separando em partes real e imaginária:
         $$w = \left(\pmb R + \frac{1}{\pmb R}\right)\cos \theta + i\left(\pmb R - \frac{1}{\pmb R}\right)\sin \theta$$
         Esta é a equação paramétrica de uma elipse, com simetria em torno dos eixos coordenados, cujos focos se
-        situam nos pontos \(\pm 2\) do eixo real. Assim, vemos que a transformação de Joukowski transforma circunferências no plano \(z\), com raio diferente de 1, para elipses
+        situam nos pontos \(\pm 2\) do eixo real. Assim, vemos que a transformação de Joukowski transforma
+        circunferências no plano \(z\), com raio diferente de 1, para elipses
         no plano \(w\).</p>
       </p>
       <div class="canvas-container">
         <canvas id="canvas3" width="400" height="400"></canvas>
         <div class="controls">
           <div class="radius-control">
-          <label for="radiusSlider2">Raio</label>
-          <input type="range" id="radiusSlider2" min="20" max="400" value="80" />
-          <span id="radiusValue2">1.00</span>
-        </div>
+            <label for="radiusSlider2">Raio</label>
+            <input type="range" id="radiusSlider2" min="20" max="400" value="80" />
+            <span id="radiusValue2">1.00</span>
+          </div>
         </div>
       </div>
     </section>
@@ -101,22 +109,22 @@
           <label for="radiusSlider">Raio</label>
           <input type="range" id="radiusSlider" min="20" max="160" value="80" />
           <span id="radiusValue">1.00</span>
-      
+
           <div class="valores-predefinidos">
             <label>Valores Predefinidos
               <button id="predefinido">Predefinidos</button>
             </label>
-            
-             <div class="fluxo-ativar">
+
+            <div class="fluxo-ativar">
               <label class="custom-checkbox">
-                  <input type="checkbox" id="fluxo">
-                  <span class="checkmark"></span>
-                  Fluxo
+                <input type="checkbox" id="fluxo">
+                <span class="checkmark"></span>
+                Fluxo
               </label>
+            </div>
           </div>
         </div>
-        </div>
-      
+
         <div class="center-control">
           <label for="centerX">Centro X</label>
           <input type="number" id="centerX" value="0" step="0.01" lang="en" />
@@ -124,7 +132,7 @@
           <input type="number" id="centerY" value="0" step="0.01" lang="en" />
         </div>
       </div>
-      
+
     </section>
   </main>
 
