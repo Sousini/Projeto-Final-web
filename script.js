@@ -259,33 +259,92 @@ function streamFunction(z, R, Gamma) {
 }
 
 function drawStreamlines() {
-  const R = radius / 80;
-  const h = centerReal.x;
-  const k = centerReal.y;
-  const alpha = Math.atan2(k, h + R);
-  const Gamma = 4 * Math.PI * U * R * Math.sin(alpha);
+    const R = radius / 80;
+    const h = centerReal.x;
+    const k = centerReal.y;
+    const alpha = Math.atan2(k, h + R);
+    const U = 1;  // velocidade uniforme
+    const Gamma = 4 * Math.PI * U * R * Math.sin(alpha);
 
-  ctx2.clearRect(0, 0, width, height); // Remova se já houver limpeza em drawTransformed
+    ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
+    drawAxes(ctx2, { x: "u", y: "v" }, offsetX2, offsetY2, scale2);
+    
 
-  // Use offsetX2, offsetY2 e scale2 do canvas2!
-  const step = 0.1;
-  for (let y = -2.5; y <= 2.5; y += step) {
-    for (let x = -3; x <= 3; x += step) {
-      const z = [x, y];
-      const zShifted = [x + h, y + k];
-      if (complexAbs([x - h, y - k]) < R + Math.pow(10, -5)) continue;
 
-      const w = applyTransformation(z[0], z[1], "joukowsky");
-      const psi = streamFunction(zShifted, R, Gamma);
+    ctx2.strokeStyle = "blue";
+    ctx2.lineWidth = 1;
 
-      // Aplicar transformações do canvas2 (scale2 e offset)
-      const screenX = offsetX2 + (w.u * -1) * 80 * scale2; // Substitua centerX por offsetX2
-      const screenY = offsetY2 - w.v * 80 * scale2; // Substitua centerY por offsetY2
+    // Valores fixos da função de corrente ψ para as linhas de corrente
+    const numLines = 20;
+    const psiMin = -3;
+    const psiMax = 3;
 
-      ctx2.fillStyle = `hsl(${(psi * 10) % 360}, 100%, 50%)`;
-      ctx2.fillRect(screenX, screenY, 3, 3);
+    for (let i = 0; i < numLines; i++) {
+        const psiVal = psiMin + (psiMax - psiMin) * i / (numLines - 1);
+        let linePoints = [];
+
+        // Para cada linha de corrente, percorremos um intervalo de x e calculamos y que satisfaça ψ(x,y)=psiVal
+        // Aqui simplificamos e varremos x e buscamos y aproximado com ψ constante (resolvendo numericamente)
+
+        for (let x = h - 3*R; x <= h + 5*R; x += 0.005) {
+            // função para achar y tal que ψ(x,y)=psiVal (resolução simples por bissecção)
+            let y = findYforPsi(x, psiVal, h, k, R, U, Gamma);
+            if (y !== null) {
+                // Verifica se ponto está fora do círculo (para evitar linhas dentro da figura)
+                const dx = x - h;
+                const dy = y - k;
+                if (Math.sqrt(dx * dx + dy * dy) > R + 0.005) {
+                    linePoints.push({ x, y });
+                }
+            }
+        }
+
+        // Transformar pontos pelo mapa de Joukowsky e desenhar
+        if (linePoints.length > 1) {
+            ctx2.beginPath();
+            for (let j = 0; j < linePoints.length; j++) {
+                const p = linePoints[j];
+                const { u, v } = applyTransformation(p.x, p.y, "joukowsky");
+                const tx = offsetX2 + (-u) * 80 * scale2;
+                const ty = offsetY2 - v * 80 * scale2;
+
+                if (j === 0) ctx2.moveTo(tx, ty);
+                else ctx2.lineTo(tx, ty);
+            }
+            ctx2.stroke();
+        }
     }
-  }
+}
+
+// Função que calcula a função de corrente ψ
+function psi(x, y, h, k, R, U, Gamma) {
+    const dx = x - h;
+    const dy = y - k;
+    const r = Math.sqrt(dx*dx + dy*dy);
+    const theta = Math.atan2(dy, dx);
+    if (r === 0) return 0;
+    return U * r * Math.sin(theta) * (1 - (R*R)/(r*r)) + (Gamma / (2 * Math.PI)) * Math.log(r / R);
+}
+
+// Função que, para dado x e psiVal, encontra y aproximado tal que ψ(x,y) = psiVal (bissecção simples)
+function findYforPsi(x, psiVal, h, k, R, U, Gamma) {
+    // Intervalo de busca para y
+    let yLow = k - 3*R;
+    let yHigh = k + 3*R;
+    let yMid;
+    const tol = 1e-6; // Tolerância para convergência
+    let maxIter = 30;
+
+    for (let i = 0; i < maxIter; i++) {
+        yMid = (yLow + yHigh) / 2;
+        const val = psi(x, yMid, h, k, R, U, Gamma) - psiVal;
+        if (Math.abs(val) < tol) return yMid;
+
+        if (val > 0) yHigh = yMid;
+        else yLow = yMid;
+    }
+    // Se não converge, retorna null
+    return null;
 }
 
 
@@ -376,7 +435,7 @@ fluxoCheckbox.addEventListener("change", () => {
   } else {
     // Limites normais
     radiusSlider.min = 10;
-    radiusSlider.max = 300;
+    radiusSlider.max = 160;
   }
 
  
