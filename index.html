@@ -14,31 +14,32 @@
   <header>
     <nav>
       <a href="#inicio">Início</a>
-      <a href="#trans">Transformações</a>
-      <a href="#app">App</a>
+      <a href="#vis">Visualização</a>
+      <a href="https://drive.google.com/uc?export=download&id=15bV_IcJFDBreThz4sFdYPv6U8ufoUPT8" download=>DownloadApp</a>
     </nav>
   </header>
 
   <main>
+    
     <section id="inicio">
-      <h2>Introdução à Transformação de Joukowski</h2>
-      <p>A transformação de Joukowski é definida pela seguinte função complexa:$$w = z + \frac{c^2}{z} , c^2 > 0$$
-        sendo que \(w\) e \(z\) são variáveis complexas e podem ser escritas na seguinte forma, $$z = x + iy$$ A
-        transformação de Joukowski é um exemplo de uma transformação conforme, ou seja, é uma função que preserva
-        os ângulos entre curvas no plano complexo.
-        Para compreender melhor a transformação, é importante explorar o conceito mais geral de transformações
-        conformes.
-      </p>
-    </section>
-
-    <section id="trans">
       <h2>Transformações Conformes</h2>
-      <h4>O que são transformações conformes?</h4>
-      <p>Transformações conformes são funções que preservam os ângulos entre curvas,
-        incluindo a magnitude e orientação desses ângulos. No entanto, não preservam o
-        comprimento dos segmentos de reta nem a escala das figuras. Estas transformações são representadas por funções
-        holomorfas, ou seja, funções que são deriváveis em um domínio aberto. Como consequência,
-        são contínuas e suaves, no sentido em que não apresenta descontinuidades, cantos ou mudanças bruscas de direção.
+      <p>
+      	As <strong>transformações conformes</strong> são funções que preservam a forma local das figuras, 
+      	nomeadamente os <strong>ângulos</strong> entre curvas que se cruzam. No plano complexo, estas transformações 
+      	desempenham um papel importante em várias áreas da física, como a aerodinâmica, a hidrodinâmica e a eletrostática.
+      </p>
+      As transformações conformes são particularmente úteis para <em>transformar  domínios complicados em domínios mais simples</em>, 
+      onde os problemas matemáticos são mais fáceis de resolver. 
+      <p>
+      	Formalmente, uma transformação conforme é uma função holomorfa com derivada não nula. Isso garante que, localmente, 
+      	a função preserva a estrutura geométrica, deformando as figuras com suavidade mas sem torções nem dobras.
+      </p>
+      
+      
+      <p>
+      	A capacidade de 
+      	<em>"simplificar sem perder a estrutura local"</em> torna as transformações conformes uma ferramenta poderosa tanto 
+      	na teoria como na prática.
       </p>
       <div class="imagens">
         <img src="img/grelha.png" />
@@ -46,44 +47,31 @@
       </div>
 
       <h2>Transformação de Joukowski</h2>
-      <p>Como sabemos a transformação é uma função racional definida por $$w = z + \frac{c^2}{z}$$ sendo utilizada em
-        aerodinâmica para transformar círculos no plano \(z\) em perfis aerodinâmicos no plano \(w\).
-        Neste projeto, consideramos o caso particular com o \(c = 1 \), resultando a seguinte função: $$ w = z +
-        \frac{1}{z}$$
-        Esta função é uma transformação conforme em \(\mathbb C \) \ { -1, 0, 1} pois quando derivamos a função \(w\),
-        obtemos
-        $$w' = 1 - \frac{1}{z^2}$$ e verificamos que se anula nos pontos
-        \(z = 1\) e \(z = -1\). Além disso, a função não está definida em \(z = 0\), logo também não é conforme nesse
-        ponto.
-        Para este caso, consideramos \( z = c e^{i\theta} \), que representa um círculo de raio \( c \) centrado na
-        origem do plano \( z \), com \( \theta \in [0, 2\pi] \).
-        Aplicando a transformação de Joukowski com \( w = z + \frac{1}{z} \), obtemos:
-        \[ w = c e^{i\theta} + \frac{1}{c e^{i\theta}} = c e^{i\theta} + \frac{1}{c} e^{-i\theta} \] Separando a parte
-        real e imaginária:
-        \[ w = \left( c + \frac{1}{c} \right) \cos\theta + i \left( c - \frac{1}{c} \right) \sin\theta \]
-        Portanto, a imagem de um círculo no plano \( z \) sob a transformação de Joukowski é, em geral, uma curva
-        semelhante a um elipse no plano \( w \). No caso particular em que \( c = 1 \), obtemos: \[ w = 2 \cos\theta \]
-        que corresponde a um segmento de reta entre -2 e 2, uma vez que a parte imaginária se anula.
+      <p>
+      	A <strong>transformação de Joukowski</strong>  é uma transformação complexa definida como:
+      $$w = T(z) = z + \frac1{z}$$
+      ou, mais geralmente, como
+      $$w = F(z) = z + \frac{c^2}{z}$$ onde \(c\) é um número real positivo e \(z\) pertence ao plano complexo, com \(z ≠ 0\).
       </p>
-      <p>Também podemos estudar o comportamento inverso da transformação ao resolver a equação \(w = z + \frac{1}{z}\)
-        para \(z\).
-        Multiplicando ambos os lados por \(z\), obtemos a equação quadrática: $$z^2 - wz + 1 = 0$$
-        cujas soluções são dadas por: $$z = \frac{w \pm \sqrt{w^2 - 4}}{2}$$
-        Este resultado mostra que, para cada \(w \in \mathbb C \setminus[-2,2]\), existem dois valores distintos
-        de \(z\) que satisfazem a transformação. O segmento de reta no intervalo \([-2, 2]\) corresponde,
-        portanto, à imagem do círculo \(|z| = 1\), onde a transformação deixa de ser injetiva.
-        Fora do segmento de reta, o plano \(z\) pode ser dividido em duas regiões - interior (\(|z| \lt 1\))
-        e exterior (\(|z| \gt 1\)) - que são mapeadas bijetivamente sobre o plano \(w\).
-        Adicionalmente, é interessante observar o efeito da transformação em círculos concêntricos de raio \(R \neq
-        1\).
-        Considerando \(z = {R}e^{i\theta}\), com \(R \gt 1\), e aplicando a transformação de Joukowski,
-        obtemos: $$w ={R}e^{i\theta} + \frac{1} {R}e^{-i\theta}$$
-        Separando em partes real e imaginária:
-        $$w = \left(R + \frac{1}{R}\right)\cos \theta + i\left(R - \frac{1} {R}\right)\sin \theta$$
-        Esta é a equação paramétrica de uma elipse, com simetria em torno dos eixos coordenados, cujos focos se
-        situam nos pontos \(\pm 2\) do eixo real. Assim, vemos que a transformação de Joukowski transforma
-        circunferências no plano \(z\), com raio diferente de 1, para elipses
-        no plano \(w\).
+      
+      <h3> Propriedades de \(T\) </h3>
+      <ul>
+      	<li> \(T\) é <strong>conforme</strong> em \(\mathbb C  \setminus \{  0\}\), exceto nos pontos onde \(T '(z) = 0\), ou seja em \(\pm 1\).</li>
+      	  <br>     
+      	<li> \(T\) transforma circunferências centradas na origem em elipses.</li>
+      <br>
+       Consideremos, no plano complexo \(z\), a circunferência   de raio \( R \), centrada na
+        origem, \( z = R e^{i\theta} \), com \( \theta \in [0, 2\pi] \).
+        Aplicando a transformação de Joukowski, obtemos:
+              $$w ={R}e^{i\theta} + \frac{1} {R}e^{-i\theta}.$$
+       Separando em partes real e imaginária:
+       $$w = \left(R + \frac{1}{R}\right)\cos \theta + i\left(R - \frac{1} {R}\right)\sin \theta.$$
+       Escrevendo \(w=u+iv\), facilmente se conclui que, se \(R\ne 1\),
+       $$\frac{u^2}{\left(R + \frac{1}{R}\right)^2} + \frac{v^2}{\left(R - \frac{1}{R}\right)^2}=1.$$
+       Esta é a equação de uma elipse no plano \(w\) centrada na origem, semieixos \(a=R + \frac{1}{R}\) e \(b=|R - \frac{1}{R}|\),   focos em \((\pm c,0)\), onde \(c=\sqrt{(R+\frac1{R})^2-(R-\frac1{R})^2}=2\) e excentricidade \(e=\frac{2 R}{1 + R^2}\).
+<br>
+        Quando \( R = 1 \), obtemos \[ w = 2 \cos\theta \]
+        que corresponde a um segmento de reta entre -2 e 2, uma vez que a parte imaginária se anula (elipse degenerada com excentricidade 1).
       </p>
       <div class="canvas-container">
         <canvas id="canvas3" width="400" height="400"></canvas>
@@ -95,32 +83,53 @@
           <span id="radiusValue2">1.00</span>
         </div>
       </div>
-      <p>Assim, a equação da imagem de um círculo com o raio \(R\) no plano \(z\), sob a transformação de Joukowski
-        pode ser expressa por: $$\frac{x^2}{\left(R + \frac{1}{R}\right)^2} + \frac{y^2}{\left(R - \frac{1}{R}\right)^2}=1$$
-        Esta é a equação de uma elipse no plano \(w\). Além disso, ao considerarmos círculos que não estão centrados
-        na origem, as curvas resultantes no plano \(w\) podem assumir formas variadas.
-        Em particular, quando o círculo no plano \(z\) passa pelo ponto crítico \(z = \pm 1\), a
-        imagem deixa de ser suave e surge uma cúspide no ponto \(w = \pm 2 \), sendo um fenómeno conhecido como
-        <em>trailing edge</em>.
+      <h4>Transformação Inversa</h4>
+      <p>
+       Podemos também estudar o comportamento inverso da transformação de Joukowski, resolvendo a equação:
+\(w = z + \frac{1}{z}\)
+para \(z\).
+  	Multiplicando ambos os membros por \(z\), obtemos uma equação quadrática:
+ $$z^2 - wz + 1 = 0,$$
+  cujas soluções  são:
+  $$z = \frac{w \pm \sqrt{w^2 - 4}}{2}.$$
+  	Isto mostra que, para cada valor \(w\ne \pm2\) existem duas soluções distintas para \(z\). Quando  \(w\in[−2,2]\), as duas soluções são conjugadas, estão sobre a circunferência unitária \(|z| = 1\) e são enviadas para o mesmo ponto \(w\).
+  	Ou seja, a transformação de Joukowski não é injetiva em todo o plano.
+
+  	O segmento real \([-2, 2]\) é precisamente a imagem da circunferência \(|z| = 1\) sob a transformação, 
+  	onde as duas soluções coincidem. Este é o local onde a transformação “colapsa” dois pontos num só.
+ 
+  	Fora desse segmento, o plano <code>z</code> pode ser dividido em duas regiões:
+  interior do círculo \(|z| &lt; 1\); exterior do círculo</strong> \(|z| &gt; 1\).
+  	Cada uma dessas regiões é mapeada bijetivamente para a região do plano \(w\) fora do intervalo \([-2, 2]\).
+  
+  </p>
+      <h4>Imagem de circunferências não centradas na origem </h4>
+      <p>
+        Quando aplicamos a transformação de Joukowski a circunferências que não estão centradas na origem no plano \(z\),
+        as imagens no plano \(w\) variam significativamente consoante a posição e o raio da circunferência.
       </p>
-      <p>Além da representação geométrica da transformação, é possível explorar algumas propriedades
-        matemáticas interessantes da transformação de Joukowski. A função pode ser reescrita de forma
-        equivalente como: $$ w + 2c = \frac{(z + c)^2}{z}, \quad w - 2c = \frac{(z - c)^2}{z}$$
-        Combinando estas expressões, obtém-se:
-        $$\left(\frac{w - 2c}{z - c}\right)^2 = \left(\frac{w + 2c}{z + c}\right)$$
-        Esta relação pode ser interpretada na forma polar dos números complexos, levando à igualdade:
-        $$\left(\frac{R_1 e^{i\theta_1}}{\rho_1 e^{iv_1}}\right)^2 = \frac{R_2 e^{i\theta_2}}{\rho_2 e^{iv_2}}$$
-        que se simplifica para:
-        $$\frac{R_1}{R_2} e^{i(\theta_1 - \theta_2)} = \left(\frac{\rho_1}{\rho_2}\right)^2 e^{i2(v_1 - v_2)}$$
-        Deste modo, obtemos a razão de módulos e a diferença de fase:
-        $$\frac{R_1}{R_2} = \left(\frac{\rho_1}{\rho_2}\right)^2, \quad \theta_1 - \theta_2 = 2(v_1 - v_2)$$
-        Esta última igualdade evidencia a propriedade de preservação de ângulos da transformação de Joukowski,
-        pois a diferença de ângulos entre dois pontos no plano \(w\) é proporcional à diferença no plano \(z\).
-        Este é um dos principais traços das transformações conformes.
+    
+      <p>
+        Se a circunferência passa por algum dos pontos \( z = \pm 1 \), a imagem no plano \(w\) deixa de ser suave
+        e surge uma <strong>cúspide</strong> em \( w = \pm 2 \). Este fenómeno, conhecido como <em>trailing edge</em>,
+        ocorre devido à não regularidade da transformação de Joukowski nesses pontos. Nestes casos, a imagem pode adquirir
+        uma forma típica de <strong>aerofólio</strong> — o contorno típico de uma asa
+        de avião —  desde que o centro do círculo esteja suficientemente próximo da origem.
+        A geometria resultante nestes casos é a razão pela qual a transformação de Joukowski é amplamente usada em modelação aerodinâmica.
+      </p>
+      
+      <p>
+        A posição do centro da circunferência no plano \( z \) tem influência direta na simetria da imagem:
+        <ul>
+          <li>Centro no eixo real → perfil simétrico.</li>
+          <li>Centro com parte imaginária não nula → perfil assimétrico.</li>
+    
+        
+       </ul>
       </p>
     </section>
 
-    <section id="app">
+    <section id="vis">
       <h2>APP</h2>
       <div class="canvas-container">
         <canvas id="canvas1" width="400" height="400"></canvas>
